@@ -1,13 +1,35 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 
-import { Button, Container, List, ListItem, TextField, Modal, Box, Table, TableCell, TableHead, Typography, Alert, TableBody, TableRow, IconButton, Grid } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { ContainerModalAgregarStyle, ContainerModalAgregarVentaStyle, ContainerModalConfirmacionStyle } from '../../Utils/Temas'
-import { ModalConfirmacion } from "../Modals/ModalConfirmacion";
-import { addCliente } from "../../services/Clientes";
-import { ModalInformacion } from "../Modals/ModalInformacion";
+import {
+    Button,
+    Container,
+    List,
+    ListItem,
+    TextField,
+    Modal,
+    Box,
+    Table,
+    TableCell,
+    TableHead,
+    Typography,
+    Alert,
+    TableBody,
+    TableRow,
+    IconButton,
+    Grid
+} from "@mui/material";
+import {useNavigate} from "react-router-dom";
+import {
+    ContainerModalAgregarStyle,
+    ContainerModalAgregarVentaStyle,
+    ContainerModalConfirmacionStyle
+} from '../../Utils/Temas'
+import {ModalConfirmacion} from "../Modals/ModalConfirmacion";
+import {addCliente} from "../../services/Clientes";
+import {ModalInformacion} from "../Modals/ModalInformacion";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import PersonAddAltRoundedIcon from '@mui/icons-material/PersonAddAltRounded';
+import {validacionRutModulo11, validarRegex} from "../../Utils/Utils";
 
 
 export const AgregarCliente = () => {
@@ -58,67 +80,51 @@ export const AgregarCliente = () => {
     }
 
     const validarNombre = () => {
-        console.log("validando nombre -->", nombreCliente);
-        if (nombreCliente === null || nombreCliente.length < 1) {
-            mostrarAlerta("error", "Debe ingresar nombre cliente");
+        const regexNombre = /^[a-zA-Z0-9_ñ\s]{3,}$/;
+        if (nombreCliente == null || !validarRegex(regexNombre, nombreCliente)) {
+            mostrarAlerta("error", "Debe ingresar nombre válido");
             return false;
         }
         return true;
     }
 
     const validarRut = () => {
-        console.log("validando rut")
-        if (rutConDV === null || rutConDV.length < 1) {
-            mostrarAlerta("error", "Debe ingresar rut cliente");
+        const regexRut = /^\d{1,2}\d{3}\d{3}-[0-9kK]$/;
+        if (rutConDV == null || !validarRegex(regexRut, rutConDV) || !validacionRutModulo11(rutConDV)) {
+            mostrarAlerta("error", "Debe ingresar rut válido en formato 11111111-1");
             return false;
-            //ingresar rut;
         }
-        return validacionRutModulo11();
+        const rut = rutConDV.replace("-", "")
+        setRut(rut.slice(0, -1));
+        setDv(rut.slice(-1));
+        return true;
     }
 
     const validarTelefono = () => {
-        console.log("validando telefono")
-        if (telefono === null || telefono.length < 1) {
-            mostrarAlerta("error", "Debe ingresar telefono cliente");
+        const regexTelefono = /^\+?[0-9_ñ]{8,11}$/;
+        if (telefono == null || !validarRegex(regexTelefono, telefono)) {
+            mostrarAlerta("error", "Debe ingresar telefono válido");
             return false;
         }
         return true;
     }
 
     const validarEmail = () => {
-        console.log("validando email")
-        if (email === null || email.length < 1) {
-            mostrarAlerta("error", "Debe ingresar email cliente");
+        const regexEmail = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+        if (email == null || !validarRegex(regexEmail, email)) {
+            mostrarAlerta("error", "Debe ingresar email valido");
             return false;
-            //ingresar rut;
         }
         return true;
-        //validar modulo 11
     }
 
     const validarDireccion = () => {
-        console.log("validando email")
-        if (direccion === null || direccion.length < 1) {
-            mostrarAlerta("error", "Debe ingresar direccion cliente");
+        const regexDireccion = /^[a-zA-Z0-9\s#ñ]{5,}$/;
+        if (direccion == null || !validarRegex(regexDireccion, direccion)) {
+            mostrarAlerta("error", "Debe ingresar direccion válida");
             return false;
-            //ingresar rut;
         }
         return true;
-        //validar modulo 11
-    }
-
-    const validacionRutModulo11 = () => {
-        //agregar la validacion de modulo 11 real
-        if (rutConDV.length > 0) {
-            let rut = rutConDV.replace("-", "");
-            const dv = rut.substring((rut.length - 1))
-            rut = rut.substring(0, rut.length - 1)
-            setRut(rut);
-            setDv(dv);
-            return true;
-        }
-        mostrarAlerta("error", "El rut ingresado es invalido");
-        return false;
     }
 
     const mostrarAlerta = (tipoAlerta, mensaje) => {
@@ -153,7 +159,7 @@ export const AgregarCliente = () => {
     }
 
     const handleClickButtonGuardar = () => {
-        if (validarCliente() == true) {
+        if (validarCliente()) {
             setOpenModalConfirmacion(true);
         }
     }
@@ -163,74 +169,59 @@ export const AgregarCliente = () => {
     }
 
     const handleOnChangeRut = (e) => {
-        //validar (?)
         setRutConDV(e.target.value)
     }
 
     const handleOnChangeDireccion = (e) => {
-        //validar (?)
         setDireccion(e.target.value)
     }
 
     const handleOnChangeTelefono = (e) => {
-        //validar (?)
         setTelefono(e.target.value)
     }
 
     const handleOnChangeEmail = (e) => {
-        //validar (?)
         setEmail(e.target.value)
-
     }
 
     const handleCloseModal = () => {
         console.log("cerrando modal")
     }
 
-    const renderAlert = () => {
-        if (showAlert) {
-            return (
-                <Alert sx={{ marginTop: '5%' }} severity={alertSeverity}>
-                    {alertContent}
-                </Alert>
-            );
-        }
-        return null;
-    };
-
     return (
         <>
-
-
-            <Modal open={openModal} onClose={handleCloseModal} BackdropProps={{ onClick: (event) => event.stopPropagation() }}>
+            <Modal open={openModal} onClose={handleCloseModal}
+                   BackdropProps={{onClick: (event) => event.stopPropagation()}}>
                 <Container sx={ContainerModalAgregarStyle}>
-                    <Typography sx={{ fontSize: '200%', marginBottom: '20px' }}>Agregar Cliente</Typography>
+                    <Typography sx={{fontSize: '200%', marginBottom: '20px'}}>Agregar Cliente</Typography>
                     <Grid container justifyContent="space-between" margin={'5%'}>
                         <IconButton color="error" onClick={handleClickCancelar}>
-                            <ArrowBackIosIcon />
+                            <ArrowBackIosIcon/>
                             Volver
                         </IconButton>
                         <IconButton color="success" onClick={handleClickButtonGuardar}>
                             Guardar
-                            <PersonAddAltRoundedIcon />
+                            <PersonAddAltRoundedIcon/>
                         </IconButton>
                     </Grid>
-                    <Box sx={{ width: '100%', overflowY: 'auto' }}>
-                        <List sx={{ padding: 0 }}>
-                            <ListItem sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                                <TextField fullWidth label="Nombre Cliente" onChange={handleOnChangeNombre} />
+                    <Box sx={{width: '100%', overflowY: 'auto'}}>
+                        <List sx={{padding: 0}}>
+                            <ListItem sx={{display: 'flex', justifyContent: 'center', width: '100%'}}>
+                                <TextField fullWidth label="Nombre Cliente" onChange={handleOnChangeNombre}/>
                             </ListItem>
-                            <ListItem sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                                <TextField fullWidth label="Rut" variant="outlined" onChange={handleOnChangeRut} />
+                            <ListItem sx={{display: 'flex', justifyContent: 'center', width: '100%'}}>
+                                <TextField fullWidth label="Rut" variant="outlined" onChange={handleOnChangeRut}/>
                             </ListItem>
-                            <ListItem sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                                <TextField fullWidth label="Direccion" variant="outlined" onChange={handleOnChangeDireccion} />
+                            <ListItem sx={{display: 'flex', justifyContent: 'center', width: '100%'}}>
+                                <TextField fullWidth label="Direccion" variant="outlined"
+                                           onChange={handleOnChangeDireccion}/>
                             </ListItem>
-                            <ListItem sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                                <TextField fullWidth label="Telefono" variant="outlined" onChange={handleOnChangeTelefono} />
+                            <ListItem sx={{display: 'flex', justifyContent: 'center', width: '100%'}}>
+                                <TextField fullWidth label="Telefono" variant="outlined"
+                                           onChange={handleOnChangeTelefono}/>
                             </ListItem>
-                            <ListItem sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                                <TextField fullWidth label="Email" variant="outlined" onChange={handleOnChangeEmail} />
+                            <ListItem sx={{display: 'flex', justifyContent: 'center', width: '100%'}}>
+                                <TextField fullWidth label="Email" variant="outlined" onChange={handleOnChangeEmail}/>
                             </ListItem>
                         </List>
                     </Box>

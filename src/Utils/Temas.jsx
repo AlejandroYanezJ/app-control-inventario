@@ -1,10 +1,10 @@
 export const BotonesNavBarStyle = {
     color: 'black',
-    '&.Mui-selected': { color: 'white' },
+    '&.Mui-selected': {color: 'white'},
 };
 
 export const ContainerRootStyle = {
-    '&.MuiContainer-root': { padding: 0, margin: 0, maxWidth: '100%' }
+    '&.MuiContainer-root': {padding: 0, margin: 0, maxWidth: '100%'}
 }
 
 export const TableStyle = {
@@ -23,8 +23,7 @@ export const CabeceraTablaStyle = {
 
 export const NavBarStyle = {
     bgcolor: '#C8C8C8',
-    width: '100%',
-    '&.MuiBottomNavigation-root': { width: '100%' },
+    '&.MuiBottomNavigation-root': {width: '100%'},
     position: 'fixed', // Fija el componente en la parte superior
     top: 0, // Lo coloca en la parte superior
     width: '100%', // Opcional: para ocupar todo el ancho
